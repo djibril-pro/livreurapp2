@@ -4,7 +4,7 @@ import {
   ecouterCommandesDisponibles, 
   accepterCommande, 
   mettreAJourStatutLivreur 
-} from '../services/commandeService';
+} from '../services/CommandeService.js';
 import CommandeDisponible from '../components/CommandeDisponible.jsx';
 import './Dashboard.css';
 import notificationUrl from '/notification.mp3';
