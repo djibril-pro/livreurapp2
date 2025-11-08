@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { mettreAJourStatutCommande } from '../services/CommandeService';
+import { mettreAJourStatutCommande } from '../services/commandeService';
 import './LivraisonActive.css';
 
 /**
