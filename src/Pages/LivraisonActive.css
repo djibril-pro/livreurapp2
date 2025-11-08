@@ -1,0 +1,83 @@
+.livraison-active-container {
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* La carte d'adresse */
+.address-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.address-card .step-header {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #555;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.address-card .address-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+}
+
+.address-card .address-details {
+  font-size: 1.1rem;
+  color: #444;
+  margin: 0;
+}
+
+/* Le bouton "Ouvrir dans Maps" */
+.map-button {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 2px solid #007bff; /* Bleu */
+  border-radius: 20px;
+  background-color: #ffffff;
+  color: #007bff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1.5rem;
+}
+
+.map-button:hover {
+  background-color: #f8f9fa;
+}
+
+/* Le bouton d'action principal */
+.action-button {
+  width: 100%;
+  padding: 1.25rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 20px;
+  background-color: #F57623; /* Votre orange */
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.action-button:hover {
+  background-color: #E0610A;
+}
+
+/* Style pour l'étape finale */
+.action-button.etape-livraison {
+  background-color: #28a745; /* Vert pour la livraison finale */
+}
+.action-button.etape-livraison:hover {
+  background-color: #218838;
+}
