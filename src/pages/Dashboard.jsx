@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'; // 1. On enlève useState
+import React, { useState, useEffect, useRef } from 'react'; // <-- LE VOILÀ !
 import { auth } from '../firebaseConfig';
 import { 
   ecouterCommandesDisponibles, 
@@ -9,31 +9,30 @@ import CommandeDisponible from '../components/CommandeDisponible.jsx';
 import './Dashboard.css';
 import notificationUrl from '/notification.mp3';
 
-// 2. ON REÇOIT LES NOUVELLES PROPS
+// Le Dashboard reçoit son statut du parent (App.jsx)
 function Dashboard({ onPrendreCommande, statutLivreur, onStatutChange }) {
   
-  // 3. ON SUPPRIME le useState local pour le statut
-  // const [statutLivreur, setStatutLivreur] = useState('Hors Ligne'); 
+  // Cet état local (pour les commandes) est toujours nécessaire
   const [commandes, setCommandes] = useState([]);
   const audioPlayer = useRef(null);
   
-  // 4. MODIFICATION de la fonction
+  // Gère le clic sur le bouton
   const handleToggleStatut = async () => {
     const livreurId = auth.currentUser?.uid;
     if (!livreurId) return;
 
-    // On lit la prop "statutLivreur"
     const newStatut = (statutLivreur === 'En Ligne') ? 'Hors Ligne' : 'En Ligne';
     
     try {
       await mettreAJourStatutLivreur(livreurId, newStatut);
-      // On appelle la fonction du parent (App.jsx)
+      // Informe le parent (App.jsx) du changement
       onStatutChange(newStatut); 
     } catch (error) {
       console.error("Erreur de mise à jour du statut:", error);
     }
   };
 
+  // Gère l'acceptation
   const handleAccepterCommande = async (commandeId) => {
     const livreurId = auth.currentUser?.uid;
     if (!livreurId) return;
@@ -47,8 +46,7 @@ function Dashboard({ onPrendreCommande, statutLivreur, onStatutChange }) {
     }
   };
 
-  // 5. L'EFFET d'écoute ne change pas, mais il dépend
-  //    maintenant de la PROP "statutLivreur"
+  // Effet d'écoute (qui dépend de la prop 'statutLivreur')
   useEffect(() => {
     if (statutLivreur === 'Hors Ligne') {
       setCommandes([]);
@@ -57,6 +55,7 @@ function Dashboard({ onPrendreCommande, statutLivreur, onStatutChange }) {
 
     const unsubscribe = ecouterCommandesDisponibles((nouvellesCommandes) => {
       setCommandes(commandesActuelles => {
+        // Joue le son seulement si une nouvelle commande arrive
         if (nouvellesCommandes.length > commandesActuelles.length && commandesActuelles.length > 0) {
           audioPlayer.current?.play();
         }
@@ -66,10 +65,9 @@ function Dashboard({ onPrendreCommande, statutLivreur, onStatutChange }) {
 
     return () => unsubscribe();
     
-  }, [statutLivreur]); // Dépend de la prop
+  }, [statutLivreur]); // Dépend de la prop qui vient de App.jsx
 
-  // Le return (affichage) reste identique,
-  // il lit simplement la prop "statutLivreur"
+  // L'affichage reste le même
   return (
     <div className="dashboard-container">
       <audio ref={audioPlayer} src={notificationUrl} preload="auto"></audio>
