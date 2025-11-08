@@ -1,10 +1,8 @@
-// Fichier: /src/firebaseConfig.js
-
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore"; // J'utilise Firestore, c'est le successeur de Realtime Database
+import { getFirestore } from "firebase/firestore"; // <-- IMPORTER FIRESTORE
 
-// TODO: Remplacez ceci par la configuration de VOTRE projet Firebase
+// VOS INFORMATIONS DE CONNEXION ICI
 const firebaseConfig = {
   apiKey: "AIzaSyDPDO8fZuWZcUGg8MRKYSZp7SPVSt5PiAU",
   authDomain: "livreurtest1.firebaseapp.com",
@@ -17,6 +15,6 @@ const firebaseConfig = {
 // Initialiser Firebase
 const app = initializeApp(firebaseConfig);
 
-// Exporter les services dont vous aurez besoin
+// Exporter les services que nous utilisons
 export const auth = getAuth(app);
-export const db = getFirestore(app); // C'est la base de données pour les profils livreurs
+export const db = getFirestore(app); // <-- EXPORTER FIRESTORE

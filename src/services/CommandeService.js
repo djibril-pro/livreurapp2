@@ -1,107 +1,98 @@
-// On importe la base de données de NOTRE Projet B (Livreur)
+// On importe les fonctions de FIRESTORE
 import { db } from '../firebaseConfig'; 
 import { 
-  ref, 
-  onValue, 
+  collection, 
+  doc, 
   query, 
-  orderByChild, 
-  equalTo,
-  runTransaction,
-  set 
-} from "firebase/database";
+  where, 
+  onSnapshot, 
+  runTransaction, 
+  updateDoc 
+} from "firebase/firestore";
 
 const DB_COLLECTION = 'Commandes_Livraison';
 
 /**
- * Écoute en temps réel les commandes qui n'ont pas de livreur 
- * et dont le statut est "En attente".
- * * @param {function} callback - La fonction à appeler à chaque mise à jour 
- * (elle recevra la liste des commandes).
- * @returns {function} - Une fonction pour se désabonner de l'écoute.
+ * Écoute en temps réel les commandes qui ont le statut "En attente".
  */
 export const ecouterCommandesDisponibles = (callback) => {
-  // On crée une requête pour filtrer les commandes :
-  // On veut celles qui ont le statut "En attente de livreur"
-  const commandesRef = query(
-    ref(db, DB_COLLECTION), 
-    orderByChild('statut'), 
-    equalTo('En attente de livreur')
+  // On crée une requête Firestore
+  const q = query(
+    collection(db, DB_COLLECTION), 
+    where('statut', '==', 'En attente de livreur')
   );
 
-  // onValue() s'exécute 1 fois, puis à chaque changement
-  const unsubscribe = onValue(commandesRef, (snapshot) => {
+  // onSnapshot est l'équivalent de onValue (Firestore)
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
     const commandesDisponibles = [];
-    if (snapshot.exists()) {
-      snapshot.forEach((childSnapshot) => {
-        commandesDisponibles.push({
-          id: childSnapshot.key, // L'ID unique de la commande
-          ...childSnapshot.val() // Le reste des données (nomRestaurant, gain, etc.)
-        });
+    querySnapshot.forEach((doc) => {
+      commandesDisponibles.push({
+        id: doc.id, // L'ID unique du document
+        ...doc.data() // Le reste des données
       });
-    }
-    // On envoie la liste (même vide) à notre composant Dashboard
+    });
     callback(commandesDisponibles);
   });
 
-  // On retourne la fonction qui permet d'arrêter l'écoute
-  return unsubscribe;
+  return unsubscribe; // Fonction pour arrêter l'écoute
 };
 
 /**
- * Tente d'accepter une commande pour un livreur.
- * Utilise une transaction pour garantir qu'un seul livreur la prend.
- * * @param {string} commandeId - L'ID de la commande à prendre.
- * @param {string} livreurId - L'ID du livreur qui tente de la prendre.
- * @returns {Promise<boolean>} - True si la transaction réussit, false sinon.
+ * Tente d'accepter une commande pour un livreur (Transaction Firestore).
  */
 export const accepterCommande = async (commandeId, livreurId) => {
-  const commandeRef = ref(db, `${DB_COLLECTION}/${commandeId}`);
+  const commandeRef = doc(db, DB_COLLECTION, commandeId); // Référence de document
 
   try {
-    const { committed, snapshot } = await runTransaction(commandeRef, (commandeActuelle) => {
-      // Si la commande a été supprimée ou déjà prise PENDANT la transaction
-      if (commandeActuelle === null || commandeActuelle.statut !== 'En attente de livreur') {
-        // On annule la transaction
-        return; 
-      }
-
-      // C'est bon, on la prend !
-      commandeActuelle.statut = 'En cours de livraison';
-      commandeActuelle.livreurId = livreurId;
+    // La transaction est un peu différente sur Firestore
+    await runTransaction(db, async (transaction) => {
+      const commandeDoc = await transaction.get(commandeRef);
       
-      return commandeActuelle; // On valide la modification
+      if (!commandeDoc.exists()) {
+        throw "La commande n'existe plus.";
+      }
+      
+      const commandeData = commandeDoc.data();
+      
+      if (commandeData.statut !== 'En attente de livreur') {
+        // Annule la transaction si déjà prise
+        return false; 
+      }
+      
+      // C'est bon, on la prend !
+      transaction.update(commandeRef, { 
+        statut: 'En cours de livraison',
+        livreurId: livreurId 
+      });
     });
 
-    if (committed) {
-      console.log('Commande prise avec succès !');
-      return true;
-    } else {
-      console.log('La commande a été prise par un autre livreur.');
-      return false;
-    }
+    console.log('Commande prise avec succès !');
+    return true;
+    
   } catch (error) {
-    console.error("Erreur lors de la transaction :", error);
+    console.error("Échec de la transaction :", error);
+    if (error === false) return false; // "false" signifie "déjà prise"
     return false;
   }
 };
 
 /**
  * Met à jour le statut du livreur (En Ligne / Hors Ligne)
- * dans la base de données "Livreurs".
- * * @param {string} livreurId - L'ID du livreur (vient de l'authentification).
- * @param {string} statut - "En Ligne" ou "Hors Ligne".
  */
 export const mettreAJourStatutLivreur = (livreurId, statut) => {
-  const livreurRef = ref(db, `Livreurs/${livreurId}/statut`);
-  return set(livreurRef, statut);
+  const livreurRef = doc(db, 'Livreurs', livreurId); // Cible le document du livreur
+  // updateDoc met à jour le champ "statut" sans écraser le reste
+  return updateDoc(livreurRef, { 
+    statut: statut 
+  });
 };
-
-// --- Fonctions pour la livraison active (Étape 5) ---
 
 /**
  * Met à jour le statut d'une commande (ex: "Récupérée", "Livrée").
  */
 export const mettreAJourStatutCommande = (commandeId, statut) => {
-  const statutRef = ref(db, `${DB_COLLECTION}/${commandeId}/statut`);
-  return set(statutRef, statut);
+  const commandeRef = doc(db, DB_COLLECTION, commandeId);
+  return updateDoc(commandeRef, { 
+    statut: statut 
+  });
 };
