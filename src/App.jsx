@@ -6,9 +6,9 @@ import { auth, onAuthStateChanged } from './firebaseConfig'; // Importer la surv
 import ConnexionLivreur from './components/ConnexionLivreur.jsx';
 import InscriptionLivreur from './components/InscriptionLivreur.jsx';
 import LivreurLayout from './layout/LivreurLayout.jsx';
-import Dashboard from './pages/Dashboard.js';
-import Profil from './pages/Profil.js';
-import LivraisonActive from './pages/LivraisonActive.js';
+import Dashboard from './pages/Dashboard.jsx';
+import Profil from './pages/Profil.jsx';
+import LivraisonActive from './pages/LivraisonActive.jsx';
 
 // --- Composant "Chargement" ---
 function LoadingScreen() {
