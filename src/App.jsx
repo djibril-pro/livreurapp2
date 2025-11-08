@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { auth, onAuthStateChanged } from './firebaseConfig'; // Importer la surveillance d'auth
+import { auth, onAuthStateChanged } from './firebaseConfig.js'; // Importer la surveillance d'auth
 
 // --- Nos composants de page ---
 import ConnexionLivreur from './components/ConnexionLivreur.jsx';
