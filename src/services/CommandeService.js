@@ -96,3 +96,30 @@ export const mettreAJourStatutCommande = (commandeId, statut) => {
     statut: statut 
   });
 };
+export const ecouterGainsLivreur = (livreurId, callback) => {
+  if (!livreurId) {
+    callback(0);
+    return () => {};
+  }
+  
+  // Requête : Commandes de ce livreur ET statut 'Livrée'
+  const q = query(
+    collection(db, DB_COLLECTION), 
+    where('livreurId', '==', livreurId),
+    where('statut', '==', 'Livrée')
+  );
+
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    let totalGains = 0;
+    querySnapshot.forEach((doc) => {
+      const gain = doc.data().gain || 0; // Utiliser le champ 'gain'
+      // S'assurer que 'gain' est un nombre (important si c'est stocké comme string)
+      totalGains += parseFloat(gain); 
+    });
+    
+    // On retourne le total formaté à deux décimales
+    callback(totalGains.toFixed(2));
+  });
+
+  return unsubscribe;
+};
