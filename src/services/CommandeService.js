@@ -7,7 +7,8 @@ import {
   where, 
   onSnapshot, 
   runTransaction, 
-  updateDoc 
+  updateDoc,
+  getDoc
 } from "firebase/firestore";
 
 const DB_COLLECTION = 'Commandes_Livraison';
@@ -122,4 +123,8 @@ export const ecouterGainsLivreur = (livreurId, callback) => {
   });
 
   return unsubscribe;
+};
+export const getProfilLivreur = (livreurId) => {
+  const livreurRef = doc(db, 'Livreurs', livreurId);
+  return getDoc(livreurRef);
 };
