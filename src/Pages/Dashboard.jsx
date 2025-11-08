@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { auth } from '../firebaseConfig'; // Importer l'authentification
+import { auth } from '../firebaseConfig.js'; // Importer l'authentification
 import { 
   ecouterCommandesDisponibles, 
   accepterCommande, 
   mettreAJourStatutLivreur 
-} from '../services/commandeService'; // Assurez-vous que le chemin est bon
+} from '../services/commandeService.js'; // Assurez-vous que le chemin est bon
 import CommandeDisponible from '../components/CommandeDisponible.jsx';
 import './Dashboard.css'; // Importer le style
 import notificationUrl from '/notification.mp3'; // Importer le son de notif
