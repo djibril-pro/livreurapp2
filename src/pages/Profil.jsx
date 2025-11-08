@@ -1,6 +1,6 @@
 import React from 'react';
-import { auth } from '../firebaseConfig'; // Pour lire les infos de l'utilisateur
-import { deconnecterLivreur } from '../services/authService'; // Notre service d'authentification
+import { auth } from '../firebaseConfig.js'; // Pour lire les infos de l'utilisateur
+import { deconnecterLivreur } from '../services/authService.js'; // Notre service d'authentification
 import './Profil.css';
 
 /**
